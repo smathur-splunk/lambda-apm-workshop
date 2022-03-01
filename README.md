@@ -1,4 +1,4 @@
-# lambda-apm-workshop
+# AWS Lambda --> Splunk APM Workshop
 In this workshop, you will create a microservices app (written in Python) out of AWS Lambda functions, using the CloudFormation template provided. You will then instrument the functions to get visibility through Splunk APM. **No coding experience necessary!**
 
 ## Table of Contents
