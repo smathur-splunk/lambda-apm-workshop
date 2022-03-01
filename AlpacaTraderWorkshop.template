@@ -1,0 +1,382 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    25c0deb9-b6d6-4795-8bae-5cb2e168798e:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 660
+        'y': 30
+      z: 1
+      embeds: []
+    faacedcd-4c12-4c4b-9932-ae7df2a266f7:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 480
+        'y': 120
+      z: 1
+      embeds: []
+      dependson:
+        - 25c0deb9-b6d6-4795-8bae-5cb2e168798e
+    6858af98-2d43-4a76-9f96-17c86991547d:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 600
+        'y': 120
+      z: 1
+      embeds: []
+      dependson:
+        - 25c0deb9-b6d6-4795-8bae-5cb2e168798e
+        - 68e025ef-7cc8-4924-acf9-e44e28de3b58
+    66659383-a4e6-4ca7-87e1-bd28e9e39033:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 750
+        'y': 120
+      z: 1
+      embeds: []
+      dependson:
+        - f31e515a-8158-4c25-95d4-de6271dbe63a
+        - 06425a85-010e-458b-98a8-cb9eecc082d6
+    ce4d1c20-e457-4f71-91f9-081f883fda3e:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 840
+        'y': 120
+      z: 1
+      embeds: []
+      dependson:
+        - 25c0deb9-b6d6-4795-8bae-5cb2e168798e
+    68e025ef-7cc8-4924-acf9-e44e28de3b58:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 600
+        'y': 210
+      z: 1
+      embeds: []
+    f31e515a-8158-4c25-95d4-de6271dbe63a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 690
+        'y': 210
+      z: 1
+      embeds: []
+      dependson:
+        - 25c0deb9-b6d6-4795-8bae-5cb2e168798e
+    06425a85-010e-458b-98a8-cb9eecc082d6:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 780
+        'y': 210
+      z: 1
+      embeds: []
+      dependson:
+        - 25c0deb9-b6d6-4795-8bae-5cb2e168798e
+    96ecc013-3c0b-4444-a7e1-7d23888fe8ed:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 360
+        'y': 120
+      z: 1
+      embeds: []
+      
+      
+Parameters:
+  environment:
+    Type: String
+    Default: deployment.environment=temp_stocktrader
+  realm:
+    Type: String
+    Default: us1
+  splunkAccessToken:
+    Type: String
+    Default: r6WjzrOAZ06SMq1ZhlRiog
+  bucketName:
+    Type: String
+    Default: tempalpacatraderbucket
+    
+    
+Resources:
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: stockTraderLambdaRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+        - 'arn:aws:iam::aws:policy/AWSLambda_FullAccess'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 96ecc013-3c0b-4444-a7e1-7d23888fe8ed
+        
+        
+  alpacatraderbucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref bucketName
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 25c0deb9-b6d6-4795-8bae-5cb2e168798e
+        
+        
+  watchlistUpdater:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: watchlistUpdater
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Code:
+        ZipFile: |
+          import json
+          import requests
+          import boto3
+          import os
+          from opentelemetry import trace
+
+          def lambda_handler(event, context):
+              alpaca_id = "PK6MU6XGW0KY0SSI402E"
+              alpaca_secret = "ZBvSlwEB8mk1DnbFZHCm18mkmeYdxVLu5nw6c8cR"
+              headers = {'APCA-API-KEY-ID':alpaca_id, 'APCA-API-SECRET-KEY':alpaca_secret}
+            
+              symbols = []
+              wl_response = requests.get('https://paper-api.alpaca.markets/v2/watchlists', headers=headers)
+              wl_id = wl_response.json()[0].get('id')
+              watchlist_response = requests.get('https://paper-api.alpaca.markets/v2/watchlists/'+wl_id, headers=headers)
+              for entity in watchlist_response.json().get('assets'):
+                  symbols.append(entity.get('symbol'))
+              encoded_string = ' '.join(symbols).encode('utf-8')
+              
+              customizedSpan = trace.get_current_span()
+              customizedSpan.set_attribute("alpaca.id", alpaca_id);
+              customizedSpan.set_attribute("alpaca.secret", alpaca_secret);
+              customizedSpan.set_attribute("watchlist", str(symbols));
+
+              s3 = boto3.resource("s3")
+              s3.Bucket(os.environ['BUCKET_NAME']).put_object(Key='watchlist.txt', Body=encoded_string)
+
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps(encoded_string.decode('utf-8'))
+              }
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
+          SPLUNK_REALM: !Ref realm
+          OTEL_RESOURCE_ATTRIBUTES: !Ref environment
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
+          BUCKET_NAME: !Ref bucketName
+      Layers:
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
+      Timeout: 300
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: faacedcd-4c12-4c4b-9932-ae7df2a266f7
+    DependsOn:
+      - alpacatraderbucket
+      - LambdaRole
+      
+      
+  stockRanker:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: stockRanker
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Code: 
+        ZipFile: |
+          import json
+          import pandas as pd
+          import boto3
+          import time
+          import os
+          from opentelemetry import trace
+        
+          def get_quote(ticker):
+              inputParams = {"symbol" : ticker}
+              quote = boto3.client('lambda').invoke(
+                  FunctionName = os.environ['GET_FIN_ARN'],
+                  InvocationType = 'RequestResponse',
+                  Payload = json.dumps(inputParams)
+              )
+              quote_json = json.load(quote['Payload'])
+            
+              close = quote_json.get('quote').get('c')
+              prevClose = quote_json.get('quote').get('pc')
+              change = round((close/prevClose-1)*100, 2)
+            
+              return {'ticker':ticker, 'change':change}
+        
+          def lambda_handler(event, context):
+              s3 = boto3.client('s3')
+              watchlist_file = s3.get_object(Bucket=os.environ['BUCKET_NAME'], Key='watchlist.txt')
+              watchlist = watchlist_file['Body'].read().decode('utf-8').split(' ')
+            
+              df = pd.DataFrame(columns=['ticker','change'])
+              for ticker in watchlist:
+                  df = df.append(get_quote(ticker), ignore_index = True)
+                  time.sleep(5)
+            
+              df = df.sort_values(by=['change'], ascending=True)
+              df = df.reset_index(drop=True)
+              stock_ranking = df['ticker'].tolist()
+              
+              customizedSpan = trace.get_current_span()
+              customizedSpan.set_attribute("watchlist", str(watchlist));
+              customizedSpan.set_attribute("rankings", str(stock_ranking));
+            
+              encoded_string = ' '.join(stock_ranking).encode('utf-8')
+              s3 = boto3.resource("s3")
+              s3.Bucket(os.environ['BUCKET_NAME']).put_object(Key='rankings.txt', Body=encoded_string)
+        
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps(encoded_string.decode('utf-8'))
+              }
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
+          SPLUNK_REALM: !Ref realm
+          OTEL_RESOURCE_ATTRIBUTES: !Ref environment
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
+          BUCKET_NAME: !Ref bucketName
+          GET_FIN_ARN: !GetAtt getFinancials.Arn
+      Layers:
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-pandas:1'
+      Timeout: 300
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 6858af98-2d43-4a76-9f96-17c86991547d
+    DependsOn:
+      - alpacatraderbucket
+      - getFinancials
+      - LambdaRole
+
+      
+  getFinancials:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: getFinancials
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Code:
+        ZipFile: |
+          import json
+          import requests
+          from opentelemetry import trace
+        
+          def lambda_handler(event, context):
+              ticker = event['symbol']
+              
+              customizedSpan = trace.get_current_span()
+              customizedSpan.set_attribute("symbol", ticker);
+              customizedSpan.set_attribute("finnhub.token", "brqivm7rh5rc4v2pmq8g");
+            
+              output = {}
+              output['ticker'] = ticker
+        
+              quote = requests.get('https://finnhub.io/api/v1/quote?symbol='+ticker+'&token=brqivm7rh5rc4v2pmq8g')
+              quote_json = json.loads(str(quote.json()).replace('\'','"').replace('None','"None"').replace('True','"True"').replace('False','"False"'))
+              output['quote'] = quote_json
+        
+              return output
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
+          SPLUNK_REALM: !Ref realm
+          OTEL_RESOURCE_ATTRIBUTES: !Ref environment
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
+          BUCKET_NAME: !Ref bucketName
+      Layers:
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
+      Timeout: 300
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 68e025ef-7cc8-4924-acf9-e44e28de3b58
+    DependsOn:
+      - LambdaRole
+      
+      
+  buyStocks:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: buyStocks
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Code:
+        ZipFile: |
+          import json
+          import requests
+          import boto3
+          import os
+          from opentelemetry import trace
+        
+          def lambda_handler(event, context):
+              s3 = boto3.client('s3')
+              alpaca_id = "PK6MU6XGW0KY0SSI402E"
+              alpaca_secret = "ZBvSlwEB8mk1DnbFZHCm18mkmeYdxVLu5nw6c8cR"
+              headers = {'APCA-API-KEY-ID':alpaca_id, 'APCA-API-SECRET-KEY':alpaca_secret}
+            
+              rankings_file = s3.get_object(Bucket=os.environ['BUCKET_NAME'], Key='rankings.txt')
+              stock_ranking = rankings_file['Body'].read().decode('utf-8').split(' ')
+              
+              customizedSpan = trace.get_current_span()
+              customizedSpan.set_attribute("alpaca.id", alpaca_id);
+              customizedSpan.set_attribute("alpaca.secret", alpaca_secret);
+              customizedSpan.set_attribute("rankings", str(stock_ranking));
+
+              for i in range(3):
+                  buy_response = requests.post('https://paper-api.alpaca.markets/v2/orders', headers=headers, json={'symbol':stock_ranking[i], 'qty':1, 'side':'buy', 'type':'market', 'time_in_force':'day'})
+            
+              return {
+                  'statusCode': 200,
+                  'body': requests.get('https://paper-api.alpaca.markets/v2/positions', headers=headers).json()
+              }
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
+          SPLUNK_REALM: !Ref realm
+          OTEL_RESOURCE_ATTRIBUTES: !Ref environment
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
+          BUCKET_NAME: !Ref bucketName
+      Layers:
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
+      Timeout: 300
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 06425a85-010e-458b-98a8-cb9eecc082d6
+    DependsOn:
+      - alpacatraderbucket
+      - LambdaRole
