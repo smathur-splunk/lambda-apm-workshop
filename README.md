@@ -12,8 +12,10 @@ In this workshop, you will create a microservices app (written in Python) out of
 - [Troubleshooting](#troubleshooting)
 
 ## Requirements
+- Access to a Splunk Observability Cloud organization with APM enabled
+- Permissions to view APM access tokens in Splunk Observability Cloud
 - AWS account
-- Permissions to create Lambda functions and S3 buckets in the 'us-east-1' (N. Virginia) region
+- Permissions to create Lambda functions and S3 buckets in the 'us-east-1' (N. Virginia) region on AWS
 
 ## Steps
 ### Create the microservices environment
@@ -28,8 +30,8 @@ In this workshop, you will create a microservices app (written in Python) out of
 ### Instrument the Lambda functions
 8. Navigate to [AWS Lambda](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) and take a moment to understand the functions in this app. There are 4 of them: 'watchlistUpdater', 'stockRanker', 'getFinancials', and 'buyStocks'. The architecture of these functions will become clear once you instrument them for APM.
 9. Navigate to the Splunk O11y 'Data Setup' page, and search for `lambda`. Select `AWS Lambda`, and click `Add Connection`. <img src="images/step09.png"/>
-10. For 'Function name', put anything you like since this won't be relevant. Select your Splunk access token (make sure it has the right permissions for APM), and enter a name for this app's environment (e.g. `lambda-app`). Click 'Next'.
-11. On the 'Install Integration' page, select `AWS Console`. Follow the steps on this page to add the Splunk OTel layer and set the environment variables. For the ARN, use `arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48`, and for the `AWS_LAMBDA_EXEC_WRAPPER` environment variable, set the value to `/opt/otel-instrument` as the functions are written in Python. **You do NOT need to specify the `OTEL_SERVICE_NAME` environment variable.** Splunk will automatically detect the Lambda function name. <img src="images/step11-1.png"/> <img src="images/step11-2.png"/> <img src="images/step11-3.png"/> <img src="images/step11-4.png"/> <img src="images/step11-5.png"/> <img src="images/step11-6.png"/>
+10. For 'Function name', enter the name of the first Lambda function you will instrument (e.g. `watchlistUpdater`). Select your Splunk access token (make sure it has the right permissions for APM), and enter a name for this app's environment (e.g. `lambda-app`). Click 'Next'. **Make sure the environment name is the same for all your functions in this app.**
+11. On the 'Install Integration' page, select `AWS Console`. Follow the steps on this page to add the Splunk OTel layer and set the environment variables. For the ARN, use `arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48`, and for the `AWS_LAMBDA_EXEC_WRAPPER` environment variable, set the value to `/opt/otel-instrument` as the functions are written in Python. <img src="images/step11-1.png"/> <img src="images/step11-2.png"/> <img src="images/step11-3.png"/> <img src="images/step11-4.png"/> <img src="images/step11-5.png"/> <img src="images/step11-6.png"/>
 12. Phew! That was a lot. Now repeat Step 11 for all 4 Lambda functions. (You do not need to go through the Splunk O11y GDI wizard again; simply make the changes necessary in AWS.)
 
 ### Run the app to generate APM data
@@ -59,11 +61,14 @@ To see what the final result *should* look like if you did everything correctly 
 
 
 ## Troubleshooting
-### Check the S3 bucket name
+### CloudFormation stack creation failed. Check the S3 bucket name.
 S3 bucket names must be unique across the entirety of AWS, so make sure that when you create your CloudFormation stack, you enter a unique name in the 'bucketName' parameters field.
 
-### Check your Splunk access token
+### Data is not being sent into Splunk Observability. Check your Splunk access token.
 Ensure that the Splunk access token you have used has the right permissions for APM data.
 
-### Check for indentation issues
+### Lambda functions won't run. Check for indentation issues.
 Don't forget to indent your code the proper amount when adding custom span tags, or the Python code won't be able to run.
+
+### In the APM service map, services aren't connected to each other. Check the environment name.
+Make sure the environment name (`OTEL_RESOURCE_ATTRIBUTES` environment variable in Lambda configuration) is the same for all your functions in this app.
