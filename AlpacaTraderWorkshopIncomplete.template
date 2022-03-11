@@ -178,6 +178,10 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref bucketName
+          SPLUNK_ACCESS_TOKEN: 
+          SPLUNK_REALM: 
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
       Timeout: 300
@@ -250,6 +254,10 @@ Resources:
         Variables:
           BUCKET_NAME: !Ref bucketName
           GET_FIN_ARN: !GetAtt getFinancials.Arn
+          SPLUNK_ACCESS_TOKEN: 
+          SPLUNK_REALM: 
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-pandas:1'
       Timeout: 300
@@ -288,6 +296,10 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref bucketName
+          SPLUNK_ACCESS_TOKEN: 
+          SPLUNK_REALM: 
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
       Timeout: 300
@@ -337,6 +349,10 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref bucketName
+          SPLUNK_ACCESS_TOKEN: 
+          SPLUNK_REALM: 
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
       Timeout: 300
