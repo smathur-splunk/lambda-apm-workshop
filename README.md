@@ -39,7 +39,7 @@ In this workshop, you will create a microservices app (written in Python) out of
 14. If 'watchlistUpdater' and 'stockRanker' run as expected, you should see 'Execution result: succeeded'.
 15. When running the 'buyStocks' function, you will get an error--**this is expected!** If you go into the service map in Splunk APM, you will now see that all 4 of our functions are there, as well as the S3 bucket that some of them are talking to. There will be a red circle for 'buyStocks', indicating that an error occurred! This is especially useful if Lambda functions are scheduled to run automatically, in which case errors won't be immediately apparent without APM. <img src="images/step18.png"/>
 16. In the APM service map, click on `buyStocks` and select `Traces` on the right. Find the trace with the error we just saw, and see if you can find the issue. If not, go to the next step.
-17. Go back to the AWS Lambda page for 'buyStocks' and in 'index.py', uncomment line 13. Click 'Deploy' to save your changes.
+17. Go back to the AWS Lambda page for 'buyStocks' and in 'index.py', uncomment line 13. Click `Deploy` to save your changes.
 ```python
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     #stock_ranking = rankings_file['Body'].read().decode('utf-8').split(' ')
     # ^^^ UNCOMMENT THE LINE ABOVE
 ```
-18. Click 'Test' to run this function again. You should now see 'Execution result: succeeded', and another trace should pop up in Splunk APM as well (this time without any errors).
+18. Click `Test` to run this function again. You should now see 'Execution result: succeeded', and another trace should pop up in Splunk APM as well (this time without any errors).
 
 ### [Optional] Add custom span tags for additional info
 19. Custom span tags are already added for 3 of the functions. Let's take a look at how to add custom span tags in the 4th one, 'getFinancials'. Open up the 'getFinancials' Lambda function.
