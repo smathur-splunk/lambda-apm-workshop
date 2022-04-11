@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     #stock_ranking = rankings_file['Body'].read().decode('utf-8').split(' ')
     # ^^^ UNCOMMENT THE LINE ABOVE
 ```
-18. Click `Test` to run this function again. You should now see 'Execution result: succeeded', and another trace should pop up in Splunk APM as well (this time without any errors).
+18. Go to the `Test` tab and run this function again. You should now see 'Execution result: succeeded', and another trace should pop up in Splunk APM as well (this time without any errors).
 
 ### [Optional] Add custom span tags for additional info
 19. Custom span tags are already added for 3 of the functions. Let's take a look at how to add custom span tags in the 4th one, 'getFinancials'. Open up the 'getFinancials' Lambda function.
