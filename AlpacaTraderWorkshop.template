@@ -188,11 +188,12 @@ Resources:
         Variables:
           SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
           SPLUNK_REALM: !Ref realm
+          OTEL_SERVICE_NAME: watchlistUpdater
           OTEL_RESOURCE_ATTRIBUTES: !Ref environment
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
           BUCKET_NAME: !Ref bucketName
       Layers:
-        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:51'
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
       Timeout: 300
     Metadata:
@@ -264,12 +265,13 @@ Resources:
         Variables:
           SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
           SPLUNK_REALM: !Ref realm
+          OTEL_SERVICE_NAME: stockRanker
           OTEL_RESOURCE_ATTRIBUTES: !Ref environment
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
           BUCKET_NAME: !Ref bucketName
           GET_FIN_ARN: !GetAtt getFinancials.Arn
       Layers:
-        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:51'
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-pandas:1'
       Timeout: 300
     Metadata:
@@ -313,11 +315,12 @@ Resources:
         Variables:
           SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
           SPLUNK_REALM: !Ref realm
+          OTEL_SERVICE_NAME: getFinancials
           OTEL_RESOURCE_ATTRIBUTES: !Ref environment
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
           BUCKET_NAME: !Ref bucketName
       Layers:
-        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:51'
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
       Timeout: 300
     Metadata:
@@ -367,11 +370,12 @@ Resources:
         Variables:
           SPLUNK_ACCESS_TOKEN: !Ref splunkAccessToken
           SPLUNK_REALM: !Ref realm
+          OTEL_SERVICE_NAME: buyStocks
           OTEL_RESOURCE_ATTRIBUTES: !Ref environment
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
           BUCKET_NAME: !Ref bucketName
       Layers:
-        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:48'
+        - 'arn:aws:lambda:us-east-1:254067382080:layer:splunk-apm:51'
         - 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-requests:1'
       Timeout: 300
     Metadata:
