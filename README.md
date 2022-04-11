@@ -36,18 +36,7 @@ In this workshop, you will create a microservices app (written in Python) out of
 
 ### Run the app to generate APM data
 13. Time to finally run the code and see some data! Manually run these 3 functions in order: 'watchlistUpdater', 'stockRanker', and 'buyStocks'. To run them, open up each function, and under the 'Function overview' section, click on the `Test` tab. Enter an event name (e.g. `test`), and at the top right, click the orange `Test` button. <img src="images/step13.png" height="350"/>
-14. If 'watchlistUpdater' and 'stockRanker' run as expected, you should see a 'Response' JSON with a status code of '200' and a body with 5 stocks listed.
-```
-\/ Exection results
-Test Event Name
-test
-
-Response
-{
-  "statusCode": 200,
-  "body": "\"FB AMZN MSFT AAPL GOOGL\""
-}
-```
+14. If 'watchlistUpdater' and 'stockRanker' run as expected, you should see `Execution result: succeeded`.
 15. When running the 'buyStocks' function, you will get an error--**this is expected!** If you go into the service map in Splunk APM, you will now see that all 4 of our functions are there, as well as the S3 bucket that some of them are talking to. There will be a red circle for 'buyStocks', indicating that an error occurred! This is especially useful if Lambda functions are scheduled to run automatically, in which case errors won't be immediately apparent without APM. <img src="images/step18.png"/>
 16. In the APM service map, click on `buyStocks` and select `Traces` on the right. Find the trace with the error we just saw, and see if you can find the issue. If not, go to the next step.
 17. Go back to the AWS Lambda page for 'buyStocks' and in 'index.py', uncomment line 13. Click 'Deploy' to save your changes.
