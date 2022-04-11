@@ -35,7 +35,7 @@ In this workshop, you will create a microservices app (written in Python) out of
 12. Phew! That was a lot. Now repeat Step 11 for all 4 Lambda functions. (You do not need to go through the Splunk O11y GDI wizard again; simply make the changes necessary in AWS.)
 
 ### Run the app to generate APM data
-13. Time to finally run the code and see some data! Manually run these 3 functions in order: 'watchlistUpdater', 'stockRanker', and 'buyStocks'. To run them, open up each function, and under the 'Function overview' section, click on the `Test` tab. Enter an event name (e.g. `test`), and at the top right, click the orange `Test` button. <img src="images/step13.png"/>
+13. Time to finally run the code and see some data! Manually run these 3 functions in order: 'watchlistUpdater', 'stockRanker', and 'buyStocks'. To run them, open up each function, and under the 'Function overview' section, click on the `Test` tab. Enter an event name (e.g. `test`), and at the top right, click the orange `Test` button. <img src="images/step13.png" height="350"/>
 14. If 'watchlistUpdater' and 'stockRanker' run as expected, you should see a 'Response' JSON with a status code of '200' and a body with 5 stocks listed.
 ```
 \/ Exection results
