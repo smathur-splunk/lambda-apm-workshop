@@ -180,6 +180,7 @@ Resources:
           BUCKET_NAME: !Ref bucketName
           SPLUNK_ACCESS_TOKEN: TOKEN
           SPLUNK_REALM: us1
+          OTEL_SERVICE_NAME: watchlistUpdater
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
@@ -256,6 +257,7 @@ Resources:
           GET_FIN_ARN: !GetAtt getFinancials.Arn
           SPLUNK_ACCESS_TOKEN: TOKEN
           SPLUNK_REALM: us1
+          OTEL_SERVICE_NAME: stockRanker
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
@@ -298,6 +300,7 @@ Resources:
           BUCKET_NAME: !Ref bucketName
           SPLUNK_ACCESS_TOKEN: TOKEN
           SPLUNK_REALM: us1
+          OTEL_SERVICE_NAME: getFinancials
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
@@ -351,6 +354,7 @@ Resources:
           BUCKET_NAME: !Ref bucketName
           SPLUNK_ACCESS_TOKEN: TOKEN
           SPLUNK_REALM: us1
+          OTEL_SERVICE_NAME: buyStocks
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
