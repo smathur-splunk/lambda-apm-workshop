@@ -178,8 +178,8 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref bucketName
-          SPLUNK_ACCESS_TOKEN: 
-          SPLUNK_REALM: 
+          SPLUNK_ACCESS_TOKEN: TOKEN
+          SPLUNK_REALM: us1
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
@@ -254,8 +254,8 @@ Resources:
         Variables:
           BUCKET_NAME: !Ref bucketName
           GET_FIN_ARN: !GetAtt getFinancials.Arn
-          SPLUNK_ACCESS_TOKEN: 
-          SPLUNK_REALM: 
+          SPLUNK_ACCESS_TOKEN: TOKEN
+          SPLUNK_REALM: us1
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
@@ -296,8 +296,8 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref bucketName
-          SPLUNK_ACCESS_TOKEN: 
-          SPLUNK_REALM: 
+          SPLUNK_ACCESS_TOKEN: TOKEN
+          SPLUNK_REALM: us1
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
@@ -349,8 +349,8 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref bucketName
-          SPLUNK_ACCESS_TOKEN: 
-          SPLUNK_REALM: 
+          SPLUNK_ACCESS_TOKEN: TOKEN
+          SPLUNK_REALM: us1
           OTEL_RESOURCE_ATTRIBUTES: deployment.environment=
           AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
       Layers:
