@@ -76,7 +76,7 @@ def lambda_handler(event, context):
 ```
 Source: [Instrument your application code to add tags to spans](https://docs.splunk.com/Observability/apm/span-tags/add-context-trace-span.html#instrument-your-application-code-to-add-tags-to-spans)
 
-21. Now if you go into `Traces` in Splunk APM and look at the traces for 'getFinancials', you'll see that each span has tags for the stock symbol being analyzed and the API token being used. This can help with troubleshooting, in case of any errors. <img src="images/step21.png"/>
+21. Click `Deploy` to save your changes. Now if you run 'stockRanker' and look at the traces for 'getFinancials' in Splunk APM, you'll see that each span has tags for the stock symbol being analyzed and the API token being used. This can help with troubleshooting, in case of any errors. <img src="images/step21.png"/>
 
 ## Conclusion
 At this point, you've created a microservices app in AWS using a CloudFormation template, and instrumented it for Splunk APM. As you probably noticed, the process of instrumenting Lambda functions for APM is simple, but tedious. This is where CloudFormation can help. For this workshop, the process of creating the app was automated, but the instrumentation can be automated too.
