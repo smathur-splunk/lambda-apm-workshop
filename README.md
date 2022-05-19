@@ -17,8 +17,22 @@ In this workshop, you will create a microservices app (written in Python) out of
 - AWS account
 - Permissions to create Lambda functions and S3 buckets in the 'us-east-1' (N. Virginia) region on AWS
 
+### Special Note on AWS Resources Needed To Provision the Demo Resources
+Two specific AWS resources are required to run this demo/workshop that are outside the scope of this demo:
+
+#### Cloudformation Service Account
+1. An IAM Role that the Cloudformation service will assume to create the resources described in the Cloudformation templates.  This a _different_ role that's used to invoke the lambda functions themselves.  This role is created outside of the project templates.  Since this IAM "user" is needed to build the other resources, it can't be included in the Cloudformation templates for the Lambda demo.  The easiest way to get up and running is to create a Cloudformation Service User Role with the following settings:
+
+![Policies](./images/cloudformation-service-role-settings-permissions.png)
+![Trust Relationship](./images/cloudformation-service-role-settings-trust-relationships.png)
+
+After this is created you'll need to note the role ARN to add to the Cloudformation GUI or CLI setup.  In other words, you're going to tell Cloudformation to run as this Service Account to generate all the demo resources.
+
+
+ 
+
 ## Steps
-### Create the microservices environment
+### Create the microservices environment (GUI)
 1. Download [this CloudFormation template](https://github.com/smathur-splunk/lambda-apm-workshop/blob/main/AlpacaTraderWorkshopIncomplete.template). This template contains all the objects (and code) that are needed for the microservices app that you will instrument.
 2. Navigate to [CloudFormation in the AWS console](https://console.aws.amazon.com/cloudformation/home?region=us-east-1). **Make sure you are in the 'us-east-1' (N. Virginia) region!!! The CloudFormation template is written for that region ONLY.**
 3. At the top-right, click `Create stack` > `With new resources (standard)`.
@@ -26,6 +40,29 @@ In this workshop, you will create a microservices app (written in Python) out of
 5. To complete the CloudFormation stack creation, give the stack a name (e.g. `lambda-stack`), and under 'Parameters', enter a name for the S3 bucket to be used by the microservices app. Click `Next`. Note that this name **must be unique across all of AWS**.
 6. On the next page titled 'Configure stack options', scroll all the way down and click `Next`. Finally, on the 'Review' page, scroll to the bottom, and select the checkbox that says 'I acknowledge that AWS CloudFormation might create IAM resources with custom names.' Then click `Create stack`.
 7. You should now see that your stack has a status of 'CREATE_IN_PROGRESS'. Wait until it says 'CREATE_COMPLETE' (or spam the refresh button, your choice). You now have a microservices app running on AWS Lambda!
+
+### Create the microservices environment (CLI)
+1. This CLI Command can be executed by either pointing the `--template-body` parameter to the local path of the Cloudformation template file, or passing `--template-url <An URL to an S3-based location of a template file>`
+2. Execute the following AWS CLI Command:
+```bash
+aws cloudformation create-stack \
+--stack-name <some-arbitrary-name> \
+--template-body file://<local-path-to-'AlpacaTraderWorkshopIncomplete.template'> \
+--region us-east-1 \
+--parameters ParameterKey=bucketName,ParameterValue=<some-arbitrary-s3-bucket-name> \
+--capabilities CAPABILITY_NAMED_IAM \
+--role-arn <the-cfn-serivce-account-role-arn>
+```
+As an example:
+```bash
+aws cloudformation create-stack \
+--stack-name lambda-demo-tsj-splunk-100 \
+--template-body file:///Users/tjohander/splunk/projects/lambda-apm-workshop/AlpacaTraderWorkshopIncomplete.template \
+--region us-east-1 \
+--parameters ParameterKey=bucketName,ParameterValue=tsj-splunk-alpaca-bucket-100 \
+--capabilities CAPABILITY_NAMED_IAM \
+--role-arn arn:aws:iam::12345678:role/cloudformation-service-role
+```
 
 ### Instrument the Lambda functions
 8. Navigate to [AWS Lambda](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) and take a moment to understand the functions in this app. There are 4 of them: 'watchlistUpdater', 'stockRanker', 'getFinancials', and 'buyStocks'. The architecture of these functions will become clear once you instrument them for APM.
@@ -82,6 +119,17 @@ Source: [Instrument your application code to add tags to spans](https://docs.spl
 At this point, you've created a microservices app in AWS using a CloudFormation template, and instrumented it for Splunk APM. As you probably noticed, the process of instrumenting Lambda functions for APM is simple, but tedious. This is where CloudFormation can help. For this workshop, the process of creating the app was automated, but the instrumentation can be automated too.
 
 To see what the final result *should* look like if you did everything correctly (and how the instrumentation process can be automated), create a stack with [this CloudFormation template](https://github.com/smathur-splunk/lambda-apm-workshop/blob/main/AlpacaTraderWorkshop.template) and run the 3 functions in the same order: 'watchlistUpdater', 'stockRanker', and 'buyStocks'.
+
+Alternatively, the final state can be deployed with the following AWS CLI Command, executed from the root of this project directory:
+```bash
+aws cloudformation create-stack \
+--stack-name <some-arbitrary-name> \
+--template-body <local-path-to-'AlpacaTraderWorkshop.template'> \
+--region us-east-1 \
+--parameters ParameterKey=bucketName,ParameterValue=<some-arbitrary-s3-bucket-name> \
+--capabilities CAPABILITY_NAMED_IAM \
+--role-arn <the-cfn-serivce-account-role-arn>
+```
 
 
 ## Troubleshooting
