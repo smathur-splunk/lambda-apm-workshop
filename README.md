@@ -4,7 +4,9 @@ In this workshop, you will create a microservices app (written in Python) out of
 ## Table of Contents
 - [Requirements](#requirements)
 - [Steps](#steps)
-  - [Create the microservices environment](#create-the-microservices-environment)
+  - Create the microservices environment
+    - [GUI](#create-the-microservices-environment-gui)
+    - [CLI](#create-the-microservices-environment-cli)
   - [Instrument the Lambda functions](#instrument-the-lambda-functions)
   - [Run the app to generate APM data](#run-the-app-to-generate-apm-data)
   - [[Optional] Add custom span tags for additional info](#optional-add-custom-span-tags-for-additional-info)
